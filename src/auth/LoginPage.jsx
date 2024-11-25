@@ -1,109 +1,79 @@
-import React, { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { postData } from "@/utils/fetch-api-data";
-import { toast } from "sonner";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
-// import { Cookie } from "lucide-react";
+'use client'
+
+import React, { useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { postData } from "@/utils/fetch-api-data"
+import { toast } from "sonner"
+import Cookies from "js-cookie"
+import { Navigate, useNavigate } from "react-router-dom"
+import { LockIcon, MailIcon } from "lucide-react"
 
 const LoginPage = () => {
-	const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
-	// const jwt = Cookies.get("token");
-	// useEffect(() => {
-	// 	if (jwt) {
-	// 		navigate("/");
-	// 	}
-	// }, [jwt, navigate]);
+  useEffect(() => {
+    if (Cookies.get("token")) {
+      setIsLoggedIn(true)
+    }
+  }, [])
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		const formData = new FormData(e.target);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
 
-		const data = {
-			email: formData.get("email"),
-			password: formData.get("password"),
-		};
+    const formData = new FormData(e.currentTarget)
 
-		try {
-			const { response } = await postData("user/login", data);
-			// console.log(response.Cookies)
-			console.log(response);
-			// Check response status
-			if (response.status === 200) {
-				// Cookies.set("token", response.data._id);
-				navigate("/"); // Correctly redirect to the home page on success
-				toast.success("Logged in successfully!");
-			} else {
-				toast.error("Failed to log in. Please check your credentials.");
-			}
-		} catch (error) {
-			console.error("Login error:", error);
-			toast.error("Failed to log in. Please check your credentials.");
-		}
-	};
+    const data = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    }
 
-	// // Redirect if already logged in
-	// if (isLoggedIn) {
-	// 	return <Navigate to="/" />;
-	// }
+    try {
+      const { response } = await postData("user/login", data)
 
-	return (
-		<div className="bg-background h-screen flex items-center justify-center p-6 lg:p-10">
-			<div className="w-full max-w-md mx-auto">
-				<Card className="rounded-3xl shadow-lg border border-gray-200">
-					<CardHeader className="text-center p-6">
-						<CardTitle className="text-2xl font-semibold">Admin Login</CardTitle>
-						<CardDescription className="text-gray-500 mt-2">
-							Enter your email and password
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="p-6 space-y-6">
-						<form onSubmit={handleSubmit} className="space-y-5">
-							<div className="space-y-1">
-								<label
-									htmlFor="email"
-									className="text-sm font-medium text-gray-700"
-								>
-									Email
-								</label>
-								<Input
-									placeholder="youremail@example.com"
-									id="email"
-									name="email"
-									className="rounded-lg px-4 py-2 border border-gray-300 w-full"
-								/>
-							</div>
-							<div className="space-y-1">
-								<label
-									htmlFor="password"
-									className="text-sm font-medium text-gray-700"
-								>
-									Password
-								</label>
-								<Input
-									placeholder="Enter your password here ..."
-									type="password"
-									id="password"
-									name="password"
-									autoComplete="new-password"
-									className="rounded-lg px-4 py-2 border border-gray-300 w-full"
-								/>
-							</div>
-							<Button
-								type="submit"
-								className="w-full rounded-3xl py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold transition duration-200 ease-in-out"
-							>
-								Login
-							</Button>
-						</form>
-					</CardContent>
-				</Card>
-			</div>
-		</div>
-	);
-};
+      if (response.status === 200) {
+        localStorage.setItem("user", JSON.stringify(response.data))
+        navigate("/")
+        toast.success("Logged in successfully!")
+      } else {
+        toast.error("Failed to log in. Please check your credentials.")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      toast.error("Failed to log in. Please check your credentials.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
-export default LoginPage;
+
+  return (
+    <div className="h-screen w-full flex items-center justify-center p-5">
+      <Card className="w-full max-w-md ">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+          <CardDescription className="text-center">Enter admin credentials to access </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="text-left w-full flex">Email</label>
+              <Input id="email" type="email" placeholder="your@email.com" name="email"required />
+            </div>
+            <div className="space-y-2">
+              <label className="text-left w-full flex">Password</label>
+              <Input id="password" type="password" placeholder="**********" name="password"required />
+            </div>
+            <Button type="submit" className="w-full">Login In</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export default LoginPage
