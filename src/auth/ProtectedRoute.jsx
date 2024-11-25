@@ -8,7 +8,7 @@ const ProtectedRoute = () => {
 	const isLoggedIn=localStorage.getItem("user")
 	if (!isLoggedIn) {
 		// Redirect to login page, but store the current location for later redirection
-		return <Navigate to="/login" state={{ from: location }} replace />;
+		return <Navigate to="/login"  replace />;
 	}
 	// If logged in, render the child routes using Outlet
 	return <Outlet />;
