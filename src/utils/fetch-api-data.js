@@ -17,6 +17,7 @@ const createConfig = (options = {}) => {
 	return {
 		baseURL: baseUrl,
 		timeout,
+		withCredentials: true, // Ensures cookies are sent with requests
 		headers: {
 			"Content-Type": "application/json",
 			// "Authorization": `Bearer ${Cookies.get("access_token")}`,

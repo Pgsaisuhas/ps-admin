@@ -1,15 +1,15 @@
+import Cookies from "js-cookie";
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 
-const ProtectedRoute = ({ isLoggedIn }) => {
+const ProtectedRoute = () => {
 	const location = useLocation();
-
+	const isLoggedIn=localStorage.getItem("user")
 	if (!isLoggedIn) {
 		// Redirect to login page, but store the current location for later redirection
 		return <Navigate to="/login" state={{ from: location }} replace />;
 	}
-
 	// If logged in, render the child routes using Outlet
 	return <Outlet />;
 };
