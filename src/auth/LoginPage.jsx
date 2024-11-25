@@ -5,18 +5,18 @@ import { Input } from "@/components/ui/input";
 import { postData } from "@/utils/fetch-api-data";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+// import { Cookie } from "lucide-react";
 
 const LoginPage = () => {
 	const navigate = useNavigate();
-	const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
-	// Check if the user is already logged in
-	useEffect(() => {
-		if (Cookies.get("token")) {
-			setIsLoggedIn(true); // Set logged-in state
-		}
-	}, []); // Run only on mount
+	// const jwt = Cookies.get("token");
+	// useEffect(() => {
+	// 	if (jwt) {
+	// 		navigate("/");
+	// 	}
+	// }, [jwt, navigate]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -29,10 +29,11 @@ const LoginPage = () => {
 
 		try {
 			const { response } = await postData("user/login", data);
-
+			// console.log(response.Cookies)
+			console.log(response);
 			// Check response status
 			if (response.status === 200) {
-				Cookies.set("token", response.data._id);
+				// Cookies.set("token", response.data._id);
 				navigate("/"); // Correctly redirect to the home page on success
 				toast.success("Logged in successfully!");
 			} else {
@@ -44,10 +45,10 @@ const LoginPage = () => {
 		}
 	};
 
-	// Redirect if already logged in
-	if (isLoggedIn) {
-		return <Navigate to="/" />;
-	}
+	// // Redirect if already logged in
+	// if (isLoggedIn) {
+	// 	return <Navigate to="/" />;
+	// }
 
 	return (
 		<div className="bg-background h-screen flex items-center justify-center p-6 lg:p-10">

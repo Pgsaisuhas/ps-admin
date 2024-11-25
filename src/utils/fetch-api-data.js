@@ -35,7 +35,9 @@ const createConfig = (options = {}) => {
 export const getData = async (endpoint, options = {}) => {
 	try {
 		const config = createConfig(options);
-		const response = await axios.get(endpoint, config);
+		const response = await axios.get(endpoint, config, {
+			withCredentials: true,
+		});
 		return {
 			response,
 			refetch: () => getData(endpoint, options),
