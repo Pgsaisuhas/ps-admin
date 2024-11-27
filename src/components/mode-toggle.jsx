@@ -7,6 +7,18 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
+import { useLocation } from 'react-router-dom';
+
+function ModeToggleWrapper() {
+	const location = useLocation();
+	const isDetailedPage = location.pathname.startsWith('/detailed');
+
+	return (
+		<div className={`absolute top-5 left-5 ${isDetailedPage ? 'hidden' : ''}`}>
+			<ModeToggle disabled={isDetailedPage} />
+		</div>
+	);
+}
 
 export function ModeToggle() {
 	const { setTheme } = useTheme();
@@ -30,3 +42,5 @@ export function ModeToggle() {
 		</DropdownMenu>
 	);
 }
+
+export { ModeToggleWrapper };

@@ -2,26 +2,26 @@ import './App.css'
 import HomePage from './pages/HomePage';
 import LoginPage from './auth/LoginPage';
 import ProtectedRoute from './auth/ProtectedRoute';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ModeToggle } from './components/mode-toggle';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { ModeToggle, ModeToggleWrapper } from './components/mode-toggle';
+import DetailedPage from './pages/DetailedPage';
 
 
 function App() {
-
-
-    return (
+	return (
 		<BrowserRouter>
-			<div className='absolute bottom-5 right-5'>
-				<ModeToggle/>
-			</div>
+			<ModeToggleWrapper />
 			<Routes>
 				<Route path="/login" element={<LoginPage />} />
 				<Route element={<ProtectedRoute />}>
-					<Route path="/" element={< HomePage />} />
+					<Route path="/" element={<HomePage />} />
+					<Route path="/detailed/:problemId" element={<DetailedPage/>} />
 				</Route>
 			</Routes>
 		</BrowserRouter>
 	);
 }
 
-export default App
+
+
+export default App;
