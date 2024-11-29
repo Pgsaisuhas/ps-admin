@@ -24,7 +24,6 @@ const HomePage = () => {
     searchQuery: "",
     selectedLevel: "all",
   });
-
   const fetchProblems = async (level) => {
     setState((prev) => ({ ...prev, loading: true }));
     try {
@@ -93,38 +92,57 @@ const HomePage = () => {
         </button>
       </header>
 
-      <div className="p-6">
-        <div className="mb-6 space-y-4">
-          <div className="max-w-md">
-            <input
-              type="text"
-              placeholder="Search by problem statement or ID..."
-              value={state.searchQuery}
-              onChange={handleSearch}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
-            />
-          </div>
-
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => handleLevelChange("all")}
-              className={getButtonClass("all")}
-            >
-              All Levels
-            </button>
-            {TOUGHNESS_LEVELS.map((level) => (
+      <div>
+        <div className="p-6">
+          <div className="mb-6 space-y-4">
+            <div className="max-w-md">
+              <input
+                type="text"
+                placeholder="Search by problem statement or ID..."
+                value={state.searchQuery}
+                onChange={handleSearch}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
               <button
-                key={level}
-                onClick={() => handleLevelChange(level)}
-                className={getButtonClass(level)}
+                onClick={() => handleLevelChange("all")}
+                className={getButtonClass("all")}
               >
-                {level}
+                All Levels
               </button>
-            ))}
-          </div>
-        </div>
 
-        <ListProblems problems={filteredProblems} loading={state.loading} />
+              {TOUGHNESS_LEVELS.map((level) => (
+                <button
+                  key={level}
+                  onClick={() => handleLevelChange(level)}
+                  className={getButtonClass(level)}
+                >
+                  {level}
+                </button>
+              ))}
+
+              <div className="ml-auto">
+                {" "}
+                {/* Use ml-auto to push the button to the right */}
+                <button
+                  onClick={() => {
+                    navigate("/addproblem");
+                  }}
+                  className="bg-blue-600 text-white py-2 px-4 rounded-lg"
+                >
+                  Add new problem
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ListProblems
+            problems={filteredProblems}
+            loading={state.loading}
+            refetch={fetchProblems}
+          />
+        </div>
       </div>
     </div>
   );

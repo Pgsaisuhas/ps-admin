@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { GrView } from "react-icons/gr";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
-
-const ListProblems = ({ problems, loading }) => {
+import { deleteData } from "@/utils/fetch-api-data";
+const ListProblems = ({ problems, loading, refetch }) => {
   const navigate = useNavigate();
 
   const getToughnessColor = (level) => {
@@ -22,14 +22,10 @@ const ListProblems = ({ problems, loading }) => {
 
   const handleDelete = async (problemId) => {
     try {
-      const { data } = await axios.delete(
-        `http://localhost:8000/api/problem/delete/${problemId}`
-      );
-
-      if (data.success) {
-        const updatedProblems = problems.filter(
-          (problem) => problem.problemId !== problemId
-        );
+      const { response } = await deleteData(`problem/delete/${problemId}`);
+      console.log(response);
+      if (response.status == 200) {
+        await refetch("all");
         toast.success("Problem deleted successfully.");
       } else {
         toast.error("Failed to delete the problem. Please try again.");
