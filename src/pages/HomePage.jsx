@@ -1,102 +1,126 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import ListProblems from "@/components/ListProblems";
 import { toast } from "sonner";
-import { getData } from "../utils/fetch-api-data"; // Adjust the path as necessary
-import { GrView } from "react-icons/gr";
+import { getData } from "../utils/fetch-api-data";
+
+const TOUGHNESS_LEVELS = ["hacker", "guru", "coder", "novice"];
+
+const BUTTON_COLORS = {
+	hacker: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-100",
+	guru: "bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-100",
+	coder: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-100",
+	default:
+		"bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white hover:bg-neutral-300 dark:hover:bg-neutral-600",
+};
 
 const HomePage = () => {
 	const navigate = useNavigate();
-	const [problems, setProblems] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [state, setState] = useState({
+		problems: [],
+		loading: true,
+		searchQuery: "",
+		selectedLevel: "all",
+	});
+
+	const fetchProblems = async (level) => {
+		setState((prev) => ({ ...prev, loading: true }));
+		try {
+			const endpoint = level === "all" ? "problem/all" : `problem/all/${level}`;
+			const { response } = await getData(endpoint);
+			const problemData = level === "all" ? response.data.data : response.data;
+
+			if (problemData) {
+				setState((prev) => ({
+					...prev,
+					problems: problemData,
+					loading: false,
+				}));
+			} else {
+				toast.error("Failed to fetch problem statements.");
+			}
+		} catch (error) {
+			toast.error("Failed to fetch problem statements.");
+			setState((prev) => ({ ...prev, loading: false }));
+		}
+	};
 
 	useEffect(() => {
-		const fetchProblems = async () => {
-			try {
-				const { response } = await getData("problem/all");
-				console.log("API Response:", response); // Log the full response
+		fetchProblems(state.selectedLevel);
+	}, [state.selectedLevel]);
 
-				if (response.data && Array.isArray(response.data.data)) {
-					setProblems(response.data.data);
-				} else {
-					console.error("Expected an array of problems but got:", response.data);
-					toast.error("Failed to fetch problem statements.");
-				}
-			} catch (error) {
-				console.error("Error fetching problem statements:", error);
-				toast.error("Failed to fetch problem statements.");
-			} finally {
-				setLoading(false);
-			}
-		};
+	const filteredProblems = useMemo(() => {
+		if (!state.searchQuery) return state.problems;
 
-		fetchProblems();
-	}, []);
+		const query = state.searchQuery.toLowerCase();
+		return state.problems.filter(
+			(problem) =>
+				problem.problemStatement?.toLowerCase().includes(query) ||
+				problem.problemId?.toString().toLowerCase().includes(query)
+		);
+	}, [state.problems, state.searchQuery]);
 
-	const handleLogout = () => {
-		navigate("/login");
+	const handleLevelChange = (level) => {
+		setState((prev) => ({ ...prev, selectedLevel: level }));
+	};
+
+	const handleSearch = (e) => {
+		setState((prev) => ({ ...prev, searchQuery: e.target.value }));
+	};
+
+	const getButtonClass = (level) => {
+		const baseClass = "px-4 py-2 rounded-lg font-medium transition duration-300";
+		if (state.selectedLevel === level) {
+			return `${baseClass} bg-blue-600 text-white`;
+		}
+		return `${baseClass} ${BUTTON_COLORS[level] || BUTTON_COLORS.default}`;
 	};
 
 	return (
 		<div className="h-dvh flex flex-col">
 			<header className="w-full shadow-md flex items-center justify-between px-8 py-4 bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 transition duration-300">
-				<h1 className="text-2xl font-bold text-center flex-1">HomePage</h1>
+				<h1 className="text-2xl font-bold text-center flex-1">Admin interface</h1>
 				<button
-					onClick={handleLogout}
+					onClick={() => navigate("/login")}
 					className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
 				>
 					Logout
 				</button>
 			</header>
 
-			<main className="flex-grow p-5">
-				{loading ? (
-					<p>Loading problems...</p>
-				) : problems.length > 0 ? (
-					<div className="overflow-x-auto shadow-md rounded-lg">
-						<table className="min-w-full divide-y divide-gray-200 bg-black">
-							<thead className="bg-transparent">
-								<tr>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-white uppercase">
-										Problem ID
-									</th>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-white uppercase">
-										Problem Statement
-									</th>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-white uppercase">
-										Toughness Level
-									</th>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-white uppercase">
-										Preview
-									</th>
-								</tr>
-							</thead>
-							<tbody className="bg-gray-800 divide-y divide-gray-200">
-								{problems.map(({ _id, problemId, problemStatement, toughnessLevel }) => (
-									<tr key={_id}>
-										<td className="px-6 py-4 whitespace-nowrap">
-											<div className="text-sm font-medium text-gray-50">{problemId}</div>
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap">
-											<div className="text-sm font-medium text-gray-50">{problemStatement}</div>
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap">
-											<div className="text-sm font-medium text-gray-50">{toughnessLevel}</div>
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-											<GrView
-												onClick={() => navigate(`/detailed/${problemId}`)}
-												style={{ cursor: 'pointer' }}
-											/>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+			<div className="p-6">
+				<div className="mb-6 space-y-4">
+					<div className="max-w-md">
+						<input
+							type="text"
+							placeholder="Search by problem statement or ID..."
+							value={state.searchQuery}
+							onChange={handleSearch}
+							className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
+						/>
 					</div>
-				) : (
-					<p>No problems available</p>
-				)}
-			</main>
+
+					<div className="flex gap-2 flex-wrap">
+						<button
+							onClick={() => handleLevelChange("all")}
+							className={getButtonClass("all")}
+						>
+							All Levels
+						</button>
+						{TOUGHNESS_LEVELS.map((level) => (
+							<button
+								key={level}
+								onClick={() => handleLevelChange(level)}
+								className={getButtonClass(level)}
+							>
+								{level}
+							</button>
+						))}
+					</div>
+				</div>
+
+				<ListProblems problems={filteredProblems} loading={state.loading} />
+			</div>
 		</div>
 	);
 };
