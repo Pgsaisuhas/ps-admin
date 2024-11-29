@@ -263,7 +263,7 @@ const DetailedPage = () => {
 
 			<div className="lg:w-full p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
 				<div className="flex justify-between items-start mb-4">
-					<div className="mt-2">
+					<div className="mt-2 space-x-3">
 						<h2 className="text-xl font-semibold">Selected Options</h2>
 						<div className="mt-2 inline-block px-4 py-2 rounded-full text-sm bg-yellow-200 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-200">
 							<strong>Language:</strong> {selectedLanguage}
