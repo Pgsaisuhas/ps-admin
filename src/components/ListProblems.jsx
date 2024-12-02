@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { GrView } from "react-icons/gr";
-
-const ListProblems = ({ problems, loading }) => {
+import { Trash } from "lucide-react";
+import { toast } from "sonner";
+import { deleteData } from "@/utils/fetch-api-data";
+const ListProblems = ({ problems, loading, refetch }) => {
   const navigate = useNavigate();
 
   const getToughnessColor = (level) => {
@@ -15,6 +17,21 @@ const ListProblems = ({ problems, loading }) => {
         return "text-yellow-500";
       default:
         return "text-green-500";
+    }
+  };
+
+  const handleDelete = async (problemId) => {
+    try {
+      const { response } = await deleteData(`problem/delete/${problemId}`);
+      console.log(response);
+      if (response.status == 200) {
+        await refetch("all");
+        toast.success("Problem deleted successfully.");
+      } else {
+        toast.error("Failed to delete the problem. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting the problem.");
     }
   };
 
@@ -56,41 +73,65 @@ const ListProblems = ({ problems, loading }) => {
                       >
                         Preview
                       </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium tracking-wider text-white uppercase bg-black"
+                      >
+                        Delete
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-gray-800 divide-y divide-gray-200">
-                    {problems.map(({
-                      _id,
-                      problemId,
-                      problemStatement,
-                      toughnessLevel,
-                    }) => (
-                      <tr key={_id} className="hover:bg-gray-700 transition-colors duration-200">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-50">
-                            {problemId}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-50 line-clamp-2">
-                            {problemStatement}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className={`text-sm font-medium ${getToughnessColor(toughnessLevel)}`}>
-                            {toughnessLevel}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => navigate(`/detailed/${problemId}`)}
-                            className="text-gray-400 hover:text-white transition-colors duration-200"
-                          >
-                            <GrView className="w-5 h-5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {problems.map(
+                      ({
+                        _id,
+                        problemId,
+                        problemStatement,
+                        toughnessLevel,
+                      }) => (
+                        <tr
+                          key={_id}
+                          className="hover:bg-gray-700 transition-colors duration-200"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-50">
+                              {problemId}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm font-medium text-gray-50 line-clamp-2">
+                              {problemStatement}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div
+                              className={`text-sm font-medium ${getToughnessColor(
+                                toughnessLevel
+                              )}`}
+                            >
+                              {toughnessLevel}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => navigate(`/detailed/${problemId}`)}
+                              className="text-gray-400 hover:text-white transition-colors duration-200"
+                            >
+                              <GrView className="w-5 h-5" />
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleDelete(problemId)}
+                              className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition duration-200"
+                              title="Delete"
+                            >
+                              <Trash className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
