@@ -15,11 +15,11 @@ const LoginPage = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
-  useEffect(() => {
-    if (Cookies.get("token")) {
-      setIsLoggedIn(true)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (Cookies.get("token")) {
+  //     setIsLoggedIn(true)
+  //   }
+  // }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
