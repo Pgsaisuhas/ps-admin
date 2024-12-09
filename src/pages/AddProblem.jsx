@@ -4,10 +4,23 @@ import { postData } from "@/utils/fetch-api-data"; // Custom API function to pos
 import CodeEditor from "@/components/CodeEditor"; // Reusable code editor component
 import { MdSave, MdCancel } from "react-icons/md";
 import { toast } from "sonner";
+import MarkDown from '@/components/MarkDown'
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm";
 
 const AddProblem = () => {
 	const navigate = useNavigate();
-
+	const [markDownValue, setMarkDownValue] = useState("");
 	const [problemData, setProblemData] = useState({
 		problemStatement: "",
 		toughnessLevel: "novice",
@@ -72,6 +85,17 @@ const AddProblem = () => {
 		return `${codeType}Code${langMap[selectedLanguage]}`;
 	};
 
+	const renderers = {
+			// Custom handling for a link
+			link: ({ href, children }) => (
+				<a href={href} target="_blank" rel="noopener noreferrer">
+					{children}
+				</a>
+			),
+			// If you want to handle a custom <url> tag, you can map it here
+			url: (props) => <a href={props.href}>{props.children}</a>,
+	};
+
 	return (
 		<div className="flex h-screen overflow-hidden">
 			{/* Left Column - Form Elements */}
@@ -82,14 +106,42 @@ const AddProblem = () => {
 					{/* Problem Statement */}
 					<div className="mb-6">
 						<h2 className="text-xl font-medium">Problem Statement</h2>
-						<textarea
+						{/* <textarea
 							value={problemData.problemStatement}
 							onChange={(e) => handleChange("problemStatement", e.target.value)}
 							className="mt-2 w-full p-2 border rounded bg-gray-700 text-white"
 							rows="4"
 							placeholder="Enter the problem statement here"
 							required
-						/>
+						/> */}
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button variant="outline">Add Problem Statement</Button>
+							</DialogTrigger>
+							<DialogContent className="max-w-6xl h-[90vh] p-0 flex flex-col">
+								<DialogHeader className="p-4">
+									<DialogTitle className="text-2xl font-semibold">
+										Markdown Rich Text Editor
+									</DialogTitle>
+								</DialogHeader>
+								<div className="flex flex-1 h-full">
+									<div className="w-1/2 border-r">
+										<MarkDown
+											value={markDownValue}
+											setValue={setMarkDownValue}
+										/>
+									</div>
+									<div className="w-1/2 p-4 overflow-auto">
+										<ReactMarkdown
+											className="prose max-w-none h-full list-inside list-disc"
+											remarkPlugins={[remarkGfm]}
+										>
+											{markDownValue || "Preview"}
+										</ReactMarkdown>
+									</div>
+								</div>
+							</DialogContent>
+						</Dialog>
 					</div>
 
 					{/* Toughness Level */}
