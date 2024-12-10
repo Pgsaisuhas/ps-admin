@@ -4,7 +4,7 @@ import ListProblems from "@/components/ListProblems";
 import { toast } from "sonner";
 import { getData } from "../utils/fetch-api-data";
 
-const TOUGHNESS_LEVELS = ["hacker", "guru", "coder", "novice"];
+const TOUGHNESS_LEVELS = ["novice", "coder", "hacker", "guru", "master"];
 
 const BUTTON_COLORS = {
   hacker:
