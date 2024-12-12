@@ -44,11 +44,12 @@ const AddProblem = () => {
 
 	const handleChange = (field, value) => {
 		setProblemData((prev) => ({ ...prev, [field]: value }));
+		console.log(problemData)
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
+		setProblemData((prev) => ({ ...prev, problemStatement: markDownValue }));
 		try {
 			console.log("Form Details:", problemData);
 			await postData(`problem/add`, problemData);
@@ -82,7 +83,9 @@ const AddProblem = () => {
 
 	const getCodeFieldName = () => {
 		const langMap = { python: "Py", java: "Java", cpp: "Cpp" };
+		console.log(`${codeType}Code${langMap[selectedLanguage]}`);
 		return `${codeType}Code${langMap[selectedLanguage]}`;
+		
 	};
 
 	const renderers = {
@@ -157,7 +160,7 @@ const AddProblem = () => {
 							<option value="coder">Coder</option>
 							<option value="hacker">Hacker</option>
 							<option value="guru">Guru</option>
-							<option value="Master">Master</option>
+							<option value="master">Master</option>
 						</select>
 					</div>
 
