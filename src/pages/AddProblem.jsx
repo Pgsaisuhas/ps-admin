@@ -22,14 +22,14 @@ const AddProblem = () => {
 	const navigate = useNavigate();
 	const [markDownValue, setMarkDownValue] = useState("");
 	const [problemData, setProblemData] = useState({
-		problemStatement: "",
+		problemStatement: "n/a",
 		toughnessLevel: "novice",
-		templateCodePy: "",
-		templateCodeJava: "",
-		templateCodeCpp: "",
-		driverCodePy: "",
-		driverCodeJava: "",
-		driverCodeCpp: "",
+		templateCodePy: "n/a",
+		templateCodeJava: "n/a",
+		templateCodeCpp: "n/a",
+		driverCodePy: "n/a",
+		driverCodeJava: "n/a",
+		driverCodeCpp: "n/a",
 	});
 
 	const [selectedLanguage, setSelectedLanguage] = useState("python");
@@ -43,8 +43,9 @@ const AddProblem = () => {
 	};
 
 	const handleChange = (field, value) => {
-		setProblemData((prev) => ({ ...prev, [field]: value }));
 		console.log(problemData)
+		setProblemData((prev) => ({ ...prev, [field]: value }));
+		
 	};
 
 	const handleSubmit = async (e) => {
